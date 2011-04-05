@@ -1,0 +1,45 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    activesupport (3.0.5)
+    addressable (2.2.4)
+    archive-tar-minitar (0.5.2)
+    columnize (0.3.2)
+    configuration (1.2.0)
+    crack (0.1.8)
+    heroku (1.19.1)
+      activesupport (>= 2.1.0)
+      launchy (~> 0.3.2)
+      rest-client (< 1.7.0, >= 1.4.0)
+    launchy (0.3.7)
+      configuration (>= 0.0.5)
+      rake (>= 0.8.1)
+    linecache19 (0.5.12)
+      ruby_core_source (>= 0.1.4)
+    mime-types (1.16)
+    mocha (0.9.12)
+    rake (0.8.7)
+    rest-client (1.6.1)
+      mime-types (>= 1.16)
+    ruby-debug-base19 (0.11.25)
+      columnize (>= 0.3.1)
+      linecache19 (>= 0.5.11)
+      ruby_core_source (>= 0.1.4)
+    ruby-debug19 (0.11.6)
+      columnize (>= 0.3.1)
+      linecache19 (>= 0.5.11)
+      ruby-debug-base19 (>= 0.11.19)
+    ruby_core_source (0.1.5)
+      archive-tar-minitar (>= 0.5.2)
+    webmock (1.6.2)
+      addressable (>= 2.2.2)
+      crack (>= 0.1.7)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  heroku
+  mocha
+  ruby-debug19
+  webmock
