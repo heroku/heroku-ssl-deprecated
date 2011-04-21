@@ -1,10 +1,12 @@
+require "heroku/command/base"
 class Heroku::Client
   def add_ssl(app_name, pemfile, keyfile)
-    response = JSON.parse post("/addons/install",
-      { :id =>app_name, :addon => "ssl:hostname_new",
-        :config => { :pem_file => pemfile, :key_file => keyfile }},
-      :accept => 'json')
-    display_message_or_errors(response, "certificate added")
+    response = post("/addons/install",
+                    { :id => app_name, :addon => "ssl:hostname_new",
+                      :config => { :pem_file => pemfile, :key_file => keyfile }},
+                      :accept => 'json')
+    json = OkJson.decode(response)
+    display_message_or_errors(json, "certificate added")
   end
 
   def display_message_or_errors(response, success_message)
@@ -13,22 +15,24 @@ class Heroku::Client
 end
 
 module Heroku::Command
+
+  # manage ssl certificates for an app
+  #
   class Ssl < BaseWithApp
-    Help.group("SSL") do |group|
-      group.command "ssl:add",         "adds SSL certificates to app"
-      group.command "ssl:remove",      "removes SSL from app"
-    end
 
-    def add
-      app = extract_app
-      if args.empty? && args.size != 2
-        raise CommandFailed, "usage: heroku ssl:add <pemfile.pem> <keyfile.key>"
-      end
-      pemfile = File.new(args.shift, "r")
-      keyfile = File.new(args.shift, "r")
-      puts heroku.add_ssl(app, pemfile, keyfile)
-      return
+    # ssl:add PEM KEY
+    #
+    # add an ssl certificate to an app
+    #
+    def new
+      raise CommandFailed, "Missing pem file." unless pem_file = args.shift
+      raise CommandFailed, "Missing key file." unless key_file = args.shift
+      raise CommandFailed, "Could not find pem in #{pem_file}"  unless File.exists?(pem_file)
+      raise CommandFailed, "Could not find key in #{key_file}"  unless File.exists?(key_file)
+      pem  = File.new(pem_file, "r")
+      key  = File.new(key_file, "r")
+      display heroku.add_ssl(app, pem, key)
     end
-
   end
 end
+

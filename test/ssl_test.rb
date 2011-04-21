@@ -2,28 +2,26 @@ require 'test/unit'
 require 'mocha'
 require 'webmock/test_unit'
 $: << File.dirname(__FILE__) + '/../lib'
-require 'heroku'
-require 'heroku/command'
+puts "about to load"
 require 'heroku/command/ssl'
 
 class TestSsl < Test::Unit::TestCase
 
   def stub_auth
-    Heroku::Command::Auth.any_instance.stubs(:ask_for_credentials).returns(["user", "secret"])
-    Heroku::Command::Ssl.any_instance.stubs(:extract_app).returns("myapp")
-    Heroku::Client.any_instance.stubs(:list).returns([])
+    # Heroku::Command::Auth.any_instance.stubs(:ask_for_credentials).returns(["user", "secret"])
+    # Heroku::Command::Ssl.any_instance.stubs(:extract_app).returns("myapp")
+    # Heroku::Client.any_instance.stubs(:list).returns([])
   end
 
   def setup
     stub_auth
-    stub_request(:any, /api\.heroku\.com/).to_return(:body => {}.to_json)
+    stub_request(:any, /api\.heroku\.com/).to_return(:body => OkJson.encode({}))
   end
 
   def test_adds_pem_and_key_to_app
     pemfile = "#{File.dirname(__FILE__)}/fixtures/cert.pem"
     keyfile = "#{File.dirname(__FILE__)}/fixtures/cert.key"
-    @command = Heroku::Command::Ssl.new([pemfile, keyfile])
-    @command.add
+    Heroku::Command.run("ssl:add", [pemfile, keyfile, "--app", "myapp"])
     assert_requested(:post, %r{api\.heroku\.com/addons/install$}) do |request|
       request.body =~ /Content-Disposition: form-data;/ &&
       request.body =~ /name="id"\r\n\r\nmyapp\r\n/ &&
