@@ -1,1 +1,2 @@
-require File.dirname(__FILE__) + '/lib/heroku/command/ssl'
+require "ssl/heroku/command/ssl"
+require "ssl/heroku/client"
