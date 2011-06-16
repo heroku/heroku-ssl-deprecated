@@ -1,6 +1,7 @@
 require "heroku/command"
 require "heroku/command/base"
 
+Heroku::Command.commands.delete("ssl:index")
 Heroku::Command.commands.delete("ssl:add")
 Heroku::Command.commands.delete("ssl:remove")
 Heroku::Command.commands.delete("ssl:clear")
@@ -9,6 +10,20 @@ module Heroku::Command
   # deprecated ssl management
   #
   class SslOld < BaseWithApp
+
+    # sslold
+    #
+    # list certificates for an app
+    #
+    def index
+      heroku.list_domains(app).each do |d|
+        if cert = d[:cert]
+          display "#{d[:domain]} has a SSL certificate registered to #{cert[:subject]} which expires on #{cert[:expires_at].strftime("%b %d, %Y")}"
+        else
+          display "#{d[:domain]} has no certificate"
+        end
+      end
+    end
 
     # sslold:add PEM KEY
     #
