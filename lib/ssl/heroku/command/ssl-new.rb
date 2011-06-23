@@ -12,7 +12,7 @@ class Heroku::Command::Ssl < Heroku::Command::BaseWithApp
     endpoints = heroku.ssl_list(app)
     if endpoints.empty?
       display "No SSL endpoints setup."
-      display "Use 'heroku ssl2:add <pemfile> <keyfile>' to create a SSL endpoint."
+      display "Use 'heroku ssl:add <pemfile> <keyfile>' to create a SSL endpoint."
     else
       endpoints.each do |endpoint|
         expiration = Time.parse(endpoint['ssl_cert']['expires_at'])
