@@ -4,22 +4,26 @@ require "heroku/command/base"
 #
 class Heroku::Command::Ssl < Heroku::Command::BaseWithApp
 
+  include Heroku::RunWithStatus
+
   # ssl
   #
   # list SSL endpoints for an app
   #
   def index
     endpoints = heroku.ssl_list(app)
+
     if endpoints.empty?
       display "No SSL endpoints setup."
       display "Use 'heroku ssl:add <pemfile> <keyfile>' to create a SSL endpoint."
     else
-      endpoints.each do |endpoint|
-        expiration = Time.parse(endpoint['ssl_cert']['expires_at'])
-        display "* #{endpoint['cname']}"
-        display "  for: #{endpoint['ssl_cert']['cert_domains'].join(', ')}"
-        display "  expires at: #{expiration.strftime("%Y-%m-%d")}"
+      endpoints.map! do |endpoint|
+        endpoint["domain"] = endpoint["ssl_cert"]["cert_domains"].join(", ")
+        endpoint["expires"] = Time.parse(endpoint["ssl_cert"]["expires_at"]).strftime("%Y-%m-%d %H:%M:%S")
+        endpoint
       end
+
+      display_table endpoints, %w( cname domain expires ), %w( Endpoint Domain Expires )
     end
   end
 
@@ -31,15 +35,13 @@ class Heroku::Command::Ssl < Heroku::Command::BaseWithApp
     pem = File.read(args[0]) rescue error("Unable to read PEM")
     key = File.read(args[1]) rescue error("Unable to read KEY")
     app = extract_app
-    info = nil
 
-    display "Adding SSL Endpoint to #{app}... ", false
-    info = heroku.ssl_add(app, pem, key)
-    expiration = Time.parse(info['ssl_cert']['expires_at'])
-    display "Done"
-    display "#{app} now served by #{info["cname"]}"
-    display "  Certificate domains: #{info['ssl_cert']['cert_domains'].join(', ')}"
-    display "  Expires at: #{expiration.strftime("%Y-%m-%d")}"
+    info = nil
+    run_with_status("-----> Adding SSL endpoint to #{app}") do
+      info = heroku.ssl_add(app, pem, key)
+    end
+
+    display "       #{app} now served by #{info['cname']}"
   end
 
   # ssl:remove CNAME
@@ -48,9 +50,9 @@ class Heroku::Command::Ssl < Heroku::Command::BaseWithApp
   #
   def remove
     cname = args.first || error("Must specify a CNAME")
-    display "Removing SSL Endpoint #{cname}...", false
-    heroku.ssl_remove(app, cname)
-    display "Done"
+    run_with_status("-----> Removing SSL endpoint #{cname} from #{app}") do
+      heroku.ssl_remove(app, cname)
+    end
   end
 
 end
