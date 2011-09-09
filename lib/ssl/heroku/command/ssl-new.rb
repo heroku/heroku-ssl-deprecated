@@ -23,7 +23,7 @@ class Heroku::Command::Ssl < Heroku::Command::BaseWithApp
         endpoint
       end
 
-      display_table endpoints, %w( cname domain expires ), %w( Endpoint Domain Expires )
+      display_table endpoints, %w( cname domain expires ), ["Endpoint" "Domain" "Cert Expires"]
     end
   end
 
