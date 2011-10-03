@@ -15,5 +15,3 @@ class Heroku::Client
     json_decode(delete("v2/apps/#{app}/ssl/#{escape(cname)}", :accept => :json).to_s)
   end
 end
-
-
