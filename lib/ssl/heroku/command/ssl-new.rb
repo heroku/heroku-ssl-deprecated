@@ -53,7 +53,7 @@ class Heroku::Command::Ssl < Heroku::Command::BaseWithApp
   # removes SSL endpoint from the app
   #
   def remove
-    cname = args.first || error("Must specify a CNAME")
+    cname = args.first || error("Usage: heroku ssl:remove CNAME")
     run_with_status("-----> Removing SSL endpoint #{cname} from #{app}") do
       heroku.ssl_remove(app, cname)
     end
