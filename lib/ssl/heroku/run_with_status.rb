@@ -67,8 +67,12 @@ module Heroku::RunWithStatus
 
   def error_with_failure(message="")
     display "failed"
-    STDERR.puts message
+    STDERR.puts rewrite_error_format(message)
     exit 1
+  end
+
+  def rewrite_error_format(message)
+    message.gsub(/ \!   /, ' !     ')
   end
 
 end
