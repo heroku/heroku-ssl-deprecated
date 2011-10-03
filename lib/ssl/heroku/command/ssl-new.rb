@@ -32,6 +32,10 @@ class Heroku::Command::Ssl < Heroku::Command::BaseWithApp
   # adds SSL endpoint to an app
   #
   def add
+    if args.size < 2
+      fail("Usage: heroku ssl:add PEM KEY")
+    end
+
     pem = File.read(args[0]) rescue error("Unable to read PEM")
     key = File.read(args[1]) rescue error("Unable to read KEY")
     app = extract_app
