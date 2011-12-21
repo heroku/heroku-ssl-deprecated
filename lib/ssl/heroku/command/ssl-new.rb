@@ -38,7 +38,7 @@ class Heroku::Command::Ssl < Heroku::Command::BaseWithApp
 
     pem = File.read(args[0]) rescue error("Unable to read PEM")
     key = File.read(args[1]) rescue error("Unable to read KEY")
-    app = extract_app
+    app = self.respond_to?(:extract_app) ? self.extract_app : self.app
 
     info = nil
     run_with_status("-----> Adding SSL endpoint to #{app}") do
